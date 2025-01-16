@@ -4,39 +4,78 @@ namespace App\Http\Controllers;
 
 use App\Models\Artist;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Routing\Controller; 
 
 class ArtistController extends Controller
 {
-    public function index()
+    public function __construct()
     {
-        return Artist::all();
+        $this->middleware(function ($request, $next) {
+            if (Auth::check() && Auth::user()->isAdmin()) {
+                return $next($request);
+            }
+            abort(403, 'Access denied');
+        })->only(['create', 'store', 'edit', 'update', 'destroy']);
     }
 
-    public function show($id)
+    public function index()
     {
-        return Artist::findOrFail($id);
+        $artists = Artist::all();
+        
+        return view('artists.index', compact('artists'));
+    }
+
+    public function create()
+    {
+        return view('artists.create');
     }
 
     public function store(Request $request)
     {
-        $artist = Artist::create($request->all());
-        
-        return response()->json($artist, 201);
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'type' => 'nullable|string|max:255',
+        ]);
+
+        $data = $request->all();
+        if (empty($data['type'])) {
+            $data['type'] = 'Unknown';
+        }
+
+        Artist::create($data);
+
+        return redirect()->route('artists.index')->with('success', 'Artist created successfully!');
     }
 
-    public function update(Request $request, $id)
+    public function show(Artist $artist)
     {
-        $artist = Artist::findOrFail($id);
-        $artist->update($request->all());
-        
-        return response()->json($artist);
+        return view('artists.show', compact('artist'));
     }
 
-    public function destroy($id)
+    public function edit(Artist $artist)
     {
-        $artist = Artist::findOrFail($id);
+        return view('artists.edit', compact('artist'));
+    }
+
+    public function update(Request $request, Artist $artist)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'type' => 'nullable|string|max:255',
+        ]);
+
+        $artist->update($request->only(['name', 'description', 'type']));
+
+        return redirect()->route('artists.index')->with('success', 'Artist updated successfully!');
+    }
+
+    public function destroy(Artist $artist)
+    {
         $artist->delete();
 
-        return response()->json(null, 204);
+        return redirect()->route('artists.index')->with('success', 'Artist deleted successfully!');
     }
 }

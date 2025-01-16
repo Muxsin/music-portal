@@ -9,6 +9,8 @@ class Track extends Model
 {
     use HasFactory;
 
+    protected $fillable = ['artist_id', 'album_id', 'name', 'duration', 'file_path'];
+
     public function artist()
     {
         return $this->belongsTo(Artist::class);

@@ -1,6 +1,13 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ArtistController;
+use App\Http\Controllers\AlbumController;
+use App\Http\Controllers\TrackController;
+use App\Http\Controllers\FavoriteController;
+use App\Http\Controllers\TrackLikeController;
+use App\Http\Controllers\ListeningHistoryController;
+use App\Http\Controllers\DownloadHistoryController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -15,3 +22,11 @@ Route::middleware([
         return view('dashboard');
     })->name('dashboard');
 });
+
+Route::resource('artists', ArtistController::class);
+Route::resource('albums', AlbumController::class);
+Route::resource('tracks', TrackController::class);
+Route::resource('favorites', FavoriteController::class);
+Route::resource('track-likes', TrackLikeController::class);
+Route::resource('listening-history', ListeningHistoryController::class);
+Route::resource('download-history', DownloadHistoryController::class);
