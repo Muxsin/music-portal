@@ -15,9 +15,9 @@
                         <div class="card-body d-flex justify-content-between align-items-center">
                             <div class="d-flex align-items-center">
                                 @if($artist->image)
-                                    <img src="{{ asset('storage/'.$artist->image) }}" alt="Artist Image" class="img-thumbnail shadow" width="80" style="margin-right: 15px;">
+                                    <img src="{{ asset('storage/'.$artist->image) }}" alt="Artist Image" class="img-thumbnail shadow" style="width: 150px; height: 150px; object-fit: cover; margin-right: 15px;">
                                 @else
-                                    <img src="{{ asset('storage/default-image.jpg') }}" alt="Default Image" class="img-thumbnail shadow" width="80" style="margin-right: 15px;">
+                                    <img src="{{ asset('storage/default-image.jpg') }}" alt="Default Image" class="img-thumbnail shadow" style="width: 150px; height: 150px; object-fit: cover; margin-right: 15px;">
                                 @endif
                                 <span>{{ $artist->name }}</span>
                             </div>
