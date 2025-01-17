@@ -37,6 +37,11 @@ class User extends Authenticatable
         return $this->is_admin;
     }
 
+    public function favorites()
+    {
+        return $this->belongsToMany(Artist::class, 'favorites', 'user_id', 'artist_id');
+    }
+
     /**
      * The attributes that should be hidden for serialization.
      *

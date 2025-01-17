@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Artist;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Routing\Controller; 
+use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Storage;
 
 class ArtistController extends Controller
 {
@@ -37,16 +38,18 @@ class ArtistController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'type' => 'nullable|string|max:255',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
         ]);
 
-        $data = $request->all();
-        if (empty($data['type'])) {
-            $data['type'] = 'Unknown';
+        $data = $request->only(['name', 'description', 'type']);
+
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('artists', 'public');
         }
 
         Artist::create($data);
 
-        return redirect()->route('artists.index')->with('success', 'Artist created successfully!');
+        return redirect()->route('artists.index');
     }
 
     public function show(Artist $artist)
@@ -65,12 +68,24 @@ class ArtistController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'type' => 'nullable|string|max:255',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
         ]);
 
-        $artist->update($request->only(['name', 'description', 'type']));
+        $data = $request->only(['name', 'description', 'type']);
+
+        if ($request->hasFile('image')) {
+            if ($artist->image) {
+                Storage::disk('public')->delete($artist->image);
+            }
+
+            $data['image'] = $request->file('image')->store('artists', 'public');
+        }
+
+        $artist->update($data);
 
         return redirect()->route('artists.index')->with('success', 'Artist updated successfully!');
     }
+
 
     public function destroy(Artist $artist)
     {

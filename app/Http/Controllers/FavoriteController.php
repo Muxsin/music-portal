@@ -2,33 +2,33 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Favorite;
+use App\Models\Artist;
 use Illuminate\Http\Request;
 
 class FavoriteController extends Controller
 {
-    public function index()
+    public function store(Artist $artist)
     {
-        return Favorite::all();
-    }
+        $artist_id = $artist->id;
 
-    public function show($id)
-    {
-        return Favorite::findOrFail($id);
-    }
-
-    public function store(Request $request)
-    {
-        $favorite = Favorite::create($request->all());
+        $alreadyFavorited = auth()->user()->favorites()->where('artist_id', $artist_id)->exists();
         
-        return response()->json($favorite, 201);
+        if ($alreadyFavorited) {
+            return redirect()->route('artists.show', $artist_id)->with('error', 'Artist is already in your favorites!');
+        }
+
+        auth()->user()->favorites()->attach($artist_id);
+
+        return redirect()->route('artists.show', $artist_id)->with('success', 'Artist added to favorites!');
     }
 
-    public function destroy($id)
-    {
-        $favorite = Favorite::findOrFail($id);
-        $favorite->delete();
 
-        return response()->json(null, 204);
+    public function destroy(Artist $artist)
+    {
+        $user = auth()->user();
+
+        $user->favorites()->detach($artist);
+
+        return redirect()->route('artists.show', $artist->id)->with('success', 'Artist removed from favorites!');
     }
 }

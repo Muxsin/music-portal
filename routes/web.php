@@ -24,9 +24,12 @@ Route::middleware([
 });
 
 Route::resource('artists', ArtistController::class);
+
+Route::post('/favorites/{artist}', [FavoriteController::class, 'store'])->name('favorites.store');
+Route::delete('/favorites/{artist}', [FavoriteController::class, 'destroy'])->name('favorites.destroy');
+
 Route::resource('albums', AlbumController::class);
 Route::resource('tracks', TrackController::class);
-Route::resource('favorites', FavoriteController::class);
 Route::resource('track-likes', TrackLikeController::class);
 Route::resource('listening-history', ListeningHistoryController::class);
 Route::resource('download-history', DownloadHistoryController::class);
