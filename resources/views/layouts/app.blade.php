@@ -24,13 +24,15 @@
     </script>
 </head>
 <body>
-    @if(session('success'))
-        <div class="alert alert-success" role="alert">
-            {{ session('success') }}
-        </div>
-    @endif
+    
 
     <main class="container-sm mt-4">
+        @if(session('success'))
+            <div class="alert alert-success" role="alert">
+                {{ session('success') }}
+            </div>
+        @endif
+
         @yield('content')
     </main>
 </body>

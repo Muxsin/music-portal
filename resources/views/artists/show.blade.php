@@ -28,7 +28,7 @@
             
             <div class="col-md-6 text-center">
                 @if($artist->image)
-                    <img src="{{ asset('storage/'.$artist->image) }}" alt="{{ $artist->name }}" class="img-fluid border rounded shadow-lg">
+                    <img src="{{ asset('storage/'.$artist->image) }}" alt="{{ $artist->name }}" class="img-fluid border rounded shadow-lg" style="width: 150px; height: 150px; object-fit: cover;">
                 @else
                     <p>No image available</p>
                 @endif

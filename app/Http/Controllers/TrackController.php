@@ -2,41 +2,154 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Album;
+use App\Models\Artist;
 use App\Models\Track;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Routing\Controller;
 
 class TrackController extends Controller
 {
-    public function index()
+    public function __construct()
     {
-        return Track::all();
+        $this->middleware(function ($request, $next) {
+            if (Auth::check() && Auth::user()->isAdmin()) {
+                return $next($request);
+            }
+            abort(403, 'Access denied');
+        })->only(['create', 'store', 'edit', 'update', 'destroy']);
     }
 
-    public function show($id)
+    // Добавление лайка
+    public function like(Track $track)
     {
-        return Track::findOrFail($id);
+        // Проверяем, поставил ли пользователь уже лайк
+        if ($track->likes()->where('user_id', Auth::id())->exists()) {
+            return redirect()->route('tracks.show', $track->id)->with('error', 'You have already liked this track.');
+        }
+
+        // Добавляем новый лайк
+        $track->likes()->create(['user_id' => Auth::id()]);
+
+        return redirect()->route('tracks.show', $track->id)->with('success', 'You liked this track.');
+    }
+
+    // Удаление лайка
+    public function unlike(Track $track)
+    {
+        // Проверяем, есть ли лайк у пользователя
+        $like = $track->likes()->where('user_id', Auth::id())->first();
+
+        if (!$like) {
+            return redirect()->route('tracks.show', $track->id)->with('error', 'You have not liked this track.');
+        }
+
+        // Удаляем лайк
+        $like->delete();
+
+        return redirect()->route('tracks.show', $track->id)->with('success', 'You unliked this track.');
+    }
+
+    public function index()
+    {
+        $tracks = Track::with(['artist', 'album'])->get();
+        
+        return view('tracks.index', compact('tracks'));
+    }
+
+    public function create()
+    {
+        $albums = Album::all();
+        $artists = Artist::all();
+
+        return view('tracks.create', compact('albums', 'artists'));
     }
 
     public function store(Request $request)
     {
-        $track = Track::create($request->all());
-        
-        return response()->json($track, 201);
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'genre' => 'nullable|string|max:100',
+            'duration' => 'nullable|integer',
+            'release_year' => 'nullable|integer',
+            'album_id' => 'nullable|exists:albums,id',
+            'artist_id' => 'required|exists:artists,id',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            // 'file_path' => 'nullable|file|mimes:mp3,wav,flac|max:10240',  // Максимум 10MB
+        ]);
+
+        $track = new Track();
+        $track->title = $request->title;
+        $track->genre = $request->genre;
+        $track->duration = $request->duration;
+        $track->release_year = $request->release_year;
+        $track->album_id = $request->album_id;
+        $track->artist_id = $request->artist_id;
+
+        if ($request->hasFile('image')) {
+            $track->image = $request->file('image')->store('track_images', 'public');
+        }
+
+        if ($request->hasFile('file_path')) {
+            $track->file_path = $request->file('file_path')->store('tracks', 'public');
+        }
+
+        $track->save();
+
+        return redirect()->route('tracks.show', $track->id)->with('success', 'Track added successfully!');
     }
 
-    public function update(Request $request, $id)
+    public function show(Track $track)
     {
-        $track = Track::findOrFail($id);
-        $track->update($request->all());
-        
-        return response()->json($track);
+        return view('tracks.show', compact('track'));
     }
 
-    public function destroy($id)
+    public function edit(Track $track)
     {
-        $track = Track::findOrFail($id);
+        $albums = Album::all();
+        $artists = Artist::all();
+
+        return view('tracks.edit', compact('track', 'albums', 'artists'));
+    }
+
+    public function update(Request $request, Track $track)
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'genre' => 'nullable|string|max:100',
+            'duration' => 'nullable|integer',
+            'release_year' => 'nullable|integer',
+            'album_id' => 'nullable|exists:albums,id',
+            'artist_id' => 'required|exists:artists,id',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            // 'file_path' => 'nullable|file|mimes:mp3,wav,flac|max:10240',  // Максимум 10MB
+        ]);
+
+        $track->title = $request->title;
+        $track->genre = $request->genre;
+        $track->duration = $request->duration;
+        $track->release_year = $request->release_year;
+        $track->album_id = $request->album_id;
+        $track->artist_id = $request->artist_id;
+
+        if ($request->hasFile('image')) {
+            $track->image = $request->file('image')->store('track_images', 'public');
+        }
+
+        if ($request->hasFile('file_path')) {
+            $track->file_path = $request->file('file_path')->store('tracks', 'public');
+        }
+
+        $track->save();
+
+        return redirect()->route('tracks.show', $track->id)->with('success', 'Track updated successfully!');
+    }
+
+    public function destroy(Track $track)
+    {
         $track->delete();
-        
-        return response()->json(null, 204);
+
+        return redirect()->route('tracks.index')->with('success', 'Track deleted successfully!');
     }
 }
