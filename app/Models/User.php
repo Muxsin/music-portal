@@ -42,6 +42,11 @@ class User extends Authenticatable
         return $this->belongsToMany(Artist::class, 'favorites', 'user_id', 'artist_id');
     }
 
+    public function tracks()
+    {
+        return $this->belongsToMany(Track::class, 'track_likes', 'user_id', 'track_id');
+    }
+
     /**
      * The attributes that should be hidden for serialization.
      *
