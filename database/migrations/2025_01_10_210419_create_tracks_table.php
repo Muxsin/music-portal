@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('genre')->nullable();
             $table->integer('duration')->nullable();
             $table->year('release_year')->nullable();
-            $table->string('file_path')->nullable();
+            $table->string('file_path');
             $table->timestamps();
 
             $table->foreign('album_id')->references('id')->on('albums')->nullOnDelete();

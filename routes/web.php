@@ -24,6 +24,7 @@ Route::middleware([
 });
 
 Route::resource('artists', ArtistController::class);
+Route::resource('tracks', TrackController::class);
 
 Route::post('/favorites/{artist}', [FavoriteController::class, 'store'])->name('favorites.store');
 Route::delete('/favorites/{artist}', [FavoriteController::class, 'destroy'])->name('favorites.destroy');
