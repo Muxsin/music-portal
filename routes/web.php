@@ -8,9 +8,12 @@ use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\TrackLikeController;
 use App\Http\Controllers\ListeningHistoryController;
 use App\Http\Controllers\DownloadHistoryController;
+use App\Models\Track;
 
 Route::get('/', function () {
-    return view('welcome');
+    $tracks = Track::with(['artist', 'album'])->get();
+        
+    return view('tracks.index', compact('tracks'));
 });
 
 Route::middleware([
@@ -31,7 +34,6 @@ Route::middleware('auth')->group(function () {
 
 Route::resource('artists', ArtistController::class);
 Route::resource('tracks', TrackController::class);
-
 
 Route::post('/favorites/{artist}', [FavoriteController::class, 'store'])->name('favorites.store');
 Route::delete('/favorites/{artist}', [FavoriteController::class, 'destroy'])->name('favorites.destroy');
