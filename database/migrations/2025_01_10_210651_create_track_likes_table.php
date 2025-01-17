@@ -11,12 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('artists', function (Blueprint $table) {
+        Schema::create('track_likes', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->text('description')->nullable();
-            $table->enum('type', ['Pop', 'Rock', 'Hip-Hop', 'Jazz', 'Classical']);
+            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('track_id');
             $table->timestamps();
+
+            $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();
+            $table->foreign('track_id')->references('id')->on('tracks')->cascadeOnDelete();
         });
     }
 
@@ -25,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('artists');
+        Schema::dropIfExists('track_likes');
     }
 };
