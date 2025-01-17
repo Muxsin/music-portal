@@ -3,7 +3,7 @@
 @section('content')
     <div class="container mt-4">
         <h1>Tracks List</h1>
-        
+
         @if(auth()->user() && auth()->user()->isAdmin())
             <a href="{{ route('tracks.create') }}" class="btn btn-success mb-3">Create track</a>
         @endif
@@ -37,6 +37,9 @@
                                             No Album
                                         @endif
                                     </p>
+                                    <div class="mt-3">
+                                        <strong>Likes:</strong> {{ $track->likes->count() }}
+                                    </div>
                                 </div>
                             </div>
 

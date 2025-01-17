@@ -35,4 +35,9 @@ class Track extends Model
     {
         return $this->hasMany(DownloadHistory::class);
     }
+
+    public function isLikedByUser()
+    {
+        return $this->likes()->where('user_id', auth()->id())->exists();
+    }
 }

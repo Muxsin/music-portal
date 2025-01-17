@@ -12,6 +12,24 @@
             <div class="media-body mx-4">
                 <h1 class="mt-0">{{ ucwords($track->title) }}</h1>
 
+                @if (Auth::check())
+                    @if ($track->isLikedByUser())
+                        <form action="{{ route('tracks.unlike', $track->id) }}" method="POST">
+                            @csrf
+                            <button type="submit" class="btn btn-danger">Unlike</button>
+                        </form>
+                    @else
+                        <form action="{{ route('tracks.like', $track->id) }}" method="POST">
+                            @csrf
+                            <button type="submit" class="btn btn-primary">Like</button>
+                        </form>
+                    @endif
+                @endif
+
+                <div class="mt-3">
+                    <strong>Likes:</strong> {{ $track->likes->count() }}
+                </div>
+                
                 <div class="row mb-3">
                     <div class="col-12 col-md-6">
                         <strong>Artist:</strong> 

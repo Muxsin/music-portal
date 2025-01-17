@@ -23,8 +23,15 @@ Route::middleware([
     })->name('dashboard');
 });
 
+
+Route::middleware('auth')->group(function () {
+    Route::post('tracks/{track}/like', [TrackController::class, 'like'])->name('tracks.like');
+    Route::post('tracks/{track}/unlike', [TrackController::class, 'unlike'])->name('tracks.unlike');
+});
+
 Route::resource('artists', ArtistController::class);
 Route::resource('tracks', TrackController::class);
+
 
 Route::post('/favorites/{artist}', [FavoriteController::class, 'store'])->name('favorites.store');
 Route::delete('/favorites/{artist}', [FavoriteController::class, 'destroy'])->name('favorites.destroy');

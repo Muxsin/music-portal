@@ -21,6 +21,36 @@ class TrackController extends Controller
         })->only(['create', 'store', 'edit', 'update', 'destroy']);
     }
 
+    // Добавление лайка
+    public function like(Track $track)
+    {
+        // Проверяем, поставил ли пользователь уже лайк
+        if ($track->likes()->where('user_id', Auth::id())->exists()) {
+            return redirect()->route('tracks.show', $track->id)->with('error', 'You have already liked this track.');
+        }
+
+        // Добавляем новый лайк
+        $track->likes()->create(['user_id' => Auth::id()]);
+
+        return redirect()->route('tracks.show', $track->id)->with('success', 'You liked this track.');
+    }
+
+    // Удаление лайка
+    public function unlike(Track $track)
+    {
+        // Проверяем, есть ли лайк у пользователя
+        $like = $track->likes()->where('user_id', Auth::id())->first();
+
+        if (!$like) {
+            return redirect()->route('tracks.show', $track->id)->with('error', 'You have not liked this track.');
+        }
+
+        // Удаляем лайк
+        $like->delete();
+
+        return redirect()->route('tracks.show', $track->id)->with('success', 'You unliked this track.');
+    }
+
     public function index()
     {
         $tracks = Track::with(['artist', 'album'])->get();
