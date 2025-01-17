@@ -6,7 +6,6 @@ use App\Models\Artist;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\Storage;
 
 class ArtistController extends Controller
 {

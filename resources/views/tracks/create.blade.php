@@ -52,7 +52,13 @@
                 <input type="file" class="form-control" name="file_path" id="file_path" required>
             </div>
 
+            <div class="mb-3">
+                <label for="image" class="form-label">Track Image</label>
+                <input type="file" class="form-control" name="image" id="image">
+            </div>
+
             <button type="submit" class="btn btn-primary">Add Track</button>
+            <a href="{{ route('tracks.index') }}" class="btn btn-secondary">Back to Track List</a>
         </form>
     </div>
 @endsection
