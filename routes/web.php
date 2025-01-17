@@ -9,6 +9,7 @@ use App\Http\Controllers\TrackLikeController;
 use App\Http\Controllers\ListeningHistoryController;
 use App\Http\Controllers\DownloadHistoryController;
 use App\Models\Track;
+use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
     $tracks = Track::with(['artist', 'album'])->get();
@@ -22,7 +23,13 @@ Route::middleware([
     'verified',
 ])->group(function () {
     Route::get('/dashboard', function () {
-        return view('dashboard');
+        $user = Auth::user();
+
+        $favoriteTracks = $user->tracks()->with('artist')->get();
+
+        $favoriteArtists = $user->favorites()->get();
+        
+        return view('dashboard', compact('favoriteTracks', 'favoriteArtists'));
     })->name('dashboard');
 });
 
